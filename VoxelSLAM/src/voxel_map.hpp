@@ -11,11 +11,12 @@
 #include "tools.hpp"
 #include <fstream>
 
-struct pointVar 
+struct pointVar
 {
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   Eigen::Vector3d pnt;
   Eigen::Matrix3d var;
+  float intensity = 0;
 };
 
 using PVec = vector<pointVar>;

@@ -305,6 +305,7 @@ public:
     {
       pcl::PointXYZI ap;
       ap.x = pw.pnt[0]; ap.y = pw.pnt[1]; ap.z = pw.pnt[2];
+      ap.intensity = pw.intensity;
       pl_save.push_back(ap);
     }
     string pcdname = savename + "/" + to_string(count) + ".pcd";
@@ -664,6 +665,7 @@ public:
       for(PointType &ap: pl.points)
       {
         pv.pnt << ap.x, ap.y, ap.z;
+        pv.intensity = ap.intensity;
         pv.pnt = extrin_para.R * pv.pnt + extrin_para.p;
         pvec.push_back(pv);
       }
@@ -691,6 +693,7 @@ public:
         Eigen::Vector3d P_compensate = xc.R.transpose() * (R_i * (extrin_para.R * P_i + extrin_para.p) + T_ei);
 
         pv.pnt = P_compensate;
+        pv.intensity = it_pcl->intensity;
         pvec.push_back(pv);
         if(it_pcl == pl.begin()) break;
       }
