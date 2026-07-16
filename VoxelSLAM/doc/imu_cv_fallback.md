@@ -89,7 +89,7 @@ IMU stream recovered at t=...: back to IMU propagation
 | parameter | default | meaning |
 |---|---|---|
 | `imu_cv_fallback` | `false` | enable the fallback (stock behaviour when off) |
-| `imu_gap_thresh` | `0.1` s | hole size that triggers padding; also the upper bound for the nominal-period estimator |
+| `imu_gap_thresh` | `0.05` s | hole size that triggers padding; also the upper bound for the nominal-period estimator. **Must stay below the scan period** (0.1 s at 10 Hz) — at or above it, a hole spanning most of one scan is never padded and the scan propagates with almost no samples |
 | `imu_cv_cov_scale` | `100.0` | process-noise inflation for synthetic pairs |
 
 The nominal IMU period is estimated online (EMA over live inter-sample gaps

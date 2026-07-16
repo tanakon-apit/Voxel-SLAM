@@ -217,7 +217,9 @@ double last_pcl_time = -1;
 // (frame_id "cv_synth") that encode zero rotation and zero world acceleration,
 // so EKF propagation, deskew and preintegration run unchanged through the gap.
 bool g_imu_cv_enable = false;
-double g_imu_gap_thresh = 0.1;     // [s] hole size that triggers padding
+double g_imu_gap_thresh = 0.05;    // [s] hole size that triggers padding; keep
+                                   // below the scan period or a hole spanning
+                                   // most of one scan is never padded
 double g_imu_period_est = 0.01;    // [s] nominal IMU period, EMA of live stream
 
 void imu_handler(const sensor_msgs::msg::Imu::ConstSharedPtr &msg_in)

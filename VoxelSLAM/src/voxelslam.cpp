@@ -1069,7 +1069,7 @@ public:
     get_param<int>(n, "Odometry/degrade_bound", degrade_bound, 10);
     // Constant-velocity fallback across IMU dropouts (see fill_imu_gaps).
     get_param<bool>(n, "Odometry/imu_cv_fallback", g_imu_cv_enable, false);
-    get_param<double>(n, "Odometry/imu_gap_thresh", g_imu_gap_thresh, 0.1);
+    get_param<double>(n, "Odometry/imu_gap_thresh", g_imu_gap_thresh, 0.05);
     get_param<double>(n, "Odometry/imu_cv_cov_scale", g_imu_cv_cov_scale, 100.0);
     // Let plane_update() initialize a plane that has none (see voxel_map.hpp).
     // CHANGES SLAM OUTPUT. Off = stock behaviour.
@@ -1975,6 +1975,23 @@ public:
 
         if(odom_ekf.process(x_curr, *pcl_curr, imus) == 0)
           continue;
+
+        // A non-finite state cannot recover through registration and would
+        // poison the map until degrade_bound trips; restart immediately.
+        if(!x_curr.p.allFinite() || !x_curr.v.allFinite() || !x_curr.R.allFinite())
+        {
+          printf("Non-finite state after propagation: restarting session\n");
+          degrade_cnt = 0;
+          system_reset(imus);
+          last_pos = x_curr.p; jour = 0;
+          mtx_loop.lock();
+          buf_lba2loop_tem.swap(buf_lba2loop);
+          mtx_loop.unlock();
+          reset_flag = 1;
+          motion_init_flag = 1;
+          history_kfsize = 0;
+          continue;
+        }
 
         pcl::PointCloud<PointType> pl_down = *pcl_curr;
         down_sampling_voxel(pl_down, down_size);

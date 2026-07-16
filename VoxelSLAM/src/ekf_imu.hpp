@@ -56,7 +56,12 @@ public:
     imu_poses.clear();
     // imu_poses.emplace_back(0, xc.R, xc.p, xc.v, angvel_last, acc_s_last);
 
-    Eigen::Vector3d acc_imu, angvel_avr, acc_avr, vel_imu(xc.v), pos_imu(xc.p);
+    // acc_imu/angvel_avr are read by the trailing extrapolation below even
+    // when the pair loop never runs (scan with <2 usable IMU samples, e.g. an
+    // unpadded dropout). Zero means constant velocity, not uninitialized NaN.
+    Eigen::Vector3d acc_imu = Eigen::Vector3d::Zero();
+    Eigen::Vector3d angvel_avr = Eigen::Vector3d::Zero();
+    Eigen::Vector3d acc_avr, vel_imu(xc.v), pos_imu(xc.p);
     Eigen::Matrix3d R_imu(xc.R);
     Eigen::Matrix<double, DIM, DIM> F_x, cov_w;
 
